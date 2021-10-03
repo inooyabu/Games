@@ -8,24 +8,19 @@
 import SwiftUI
 import URLImage
 import Alamofire
+import CoreData
 
 struct GameDetail: View {
     @ObservedObject var apiServiceDetail = ApiServiceDetail()
+
+//    @FetchRequest(entity: FavoriteGameEntity.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \FavoriteGameEntity.id, ascending: true)]) var favorites: FetchedResults<FavoriteGameEntity>
 
     var idGame: Int
 
     @Environment(\.managedObjectContext) var moc
     @Environment(\.presentationMode) var presentationMode
 
-//    @State var isFavorite = true
-    @State private var statName = ""
-    @State private var statReleased = ""
-    @State private var statWebsite = ""
-    @State private var description = ""
-    @State private var statId = 0
-    @State private var statRating = 0
-    @State private var statBackgroundImage = ""
-    @State private var isFavorite = true
+    @State var isFavorite = false
 
     var body: some View {
         ScrollView {
@@ -45,15 +40,31 @@ struct GameDetail: View {
                         .bold()
 
                     if isFavorite {
-//                        Image(systemName: "heart.fill")
-//                            .foregroundColor(.red)
                         Button(action: {
+                            print("Ini kalau isFavorite true, trus diklik, jadinya false")
                             isFavorite = false
+
+                            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "FavoriteGameEntity")
+                            fetchRequest.fetchLimit = 1
+                            fetchRequest.predicate = NSPredicate(format: "id == \(apiServiceDetail.gameDetail.id)")
+                            let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+                            batchDeleteRequest.resultType = .resultTypeCount
+
+                            do {
+                                try self.moc.execute(batchDeleteRequest)
+                                self.moc.reset()
+                            } catch let error as NSError {
+                                print("Errornya adalah \(error)")
+                            }
+
                         }) {
                             Image(systemName: "heart.fill")
                         }
                     } else {
                         Button(action: {
+                            print("Ini kalau isFavorite false, trus diklik, jadinya true")
+                            isFavorite = true
+
                             let favoriteEntity = FavoriteGameEntity(context: self.moc)
                             favoriteEntity.id = Int32(apiServiceDetail.gameDetail.id)
                             favoriteEntity.name = apiServiceDetail.gameDetail.name
@@ -62,7 +73,7 @@ struct GameDetail: View {
                             favoriteEntity.rating = apiServiceDetail.gameDetail.rating
                             favoriteEntity.website = apiServiceDetail.gameDetail.website
                             favoriteEntity.rawDescription = apiServiceDetail.gameDetail.description
-                            favoriteEntity.isFavorite = true
+                            favoriteEntity.isFavorite = isFavorite
 
                             do {
                                 try self.moc.save()
@@ -109,4 +120,3 @@ extension Double {
         return String(format: "%.2f", self)
     }
 }
-

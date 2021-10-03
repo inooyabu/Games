@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct DetailFavorit: View {
+    var fav: String
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Text("Hello, World!")
+        Text(fav)
+            .bold()
+
     }
 }
 
-struct DetailFavorit_Previews: PreviewProvider {
-    static var previews: some View {
-        DetailFavorit()
-    }
-}

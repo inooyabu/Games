@@ -16,21 +16,28 @@ struct Favorite: View {
         NavigationView {
             List {
                 ForEach(favorites, id: \.self) { favoriteGame in
-                        NavigationLink(destination: DetailFavorit()) {
+                    NavigationLink(destination: DetailFavorit(fav: favoriteGame.name!)) {
                             Text(favoriteGame.name!)
                         }
-                    }
                 }
-//                .onDelete(perform: deleteUser(at:))
-//                .edgesIgnoringSafeArea(.all)
+                .onDelete(perform: deleteFavorite(at:))
                 if favorites.count == 0 {
                     Text("No data found")
                 }
             }
-            .listStyle(GroupedListStyle())
-            }
         }
-
+        .listStyle(GroupedListStyle())
+    }
+//Soon Delete
+    func deleteFavorite(at offsets: IndexSet) {
+        for index in offsets {
+            let favorite = favorites[index]
+            moc.delete(favorite)
+            print("Delete \(favorite)")
+        }
+        try? moc.save()
+    }
+}
 
 
 struct Favorite_Previews: PreviewProvider {

@@ -24,7 +24,6 @@ class ApiService: ObservableObject {
             .responseJSON { response in
                 switch response.result {
                 case .success:
-                    print("Success Get Data")
                     guard let data = response.data else { return }
                     let games = try! JSONDecoder().decode(GameList.self, from: data)
                     DispatchQueue.main.async {
