@@ -11,16 +11,13 @@ import Alamofire
 import CoreData
 
 struct GameDetail: View {
-    @ObservedObject var apiServiceDetail = ApiServiceDetail()
-
-//    @FetchRequest(entity: FavoriteGameEntity.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \FavoriteGameEntity.id, ascending: true)]) var favorites: FetchedResults<FavoriteGameEntity>
-
+    @State var isFavorite = true
     var idGame: Int
 
-    @Environment(\.managedObjectContext) var moc
-    @Environment(\.presentationMode) var presentationMode
-
-    @State var isFavorite = false
+    @ObservedObject var apiServiceDetail = ApiServiceDetail()
+    @ObservedObject var addFavoriteVM = AddFavorite()
+    @ObservedObject var deleteFavoriteVM = DeleteFavorite()
+    @ObservedObject var favoriteIdVM = FavoriteGameIdVM()
 
     var body: some View {
         ScrollView {
@@ -39,50 +36,49 @@ struct GameDetail: View {
                         .font(.system(size: 25))
                         .bold()
 
-                    if isFavorite {
-                        Button(action: {
-                            print("Ini kalau isFavorite true, trus diklik, jadinya false")
-                            isFavorite = false
-
-                            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "FavoriteGameEntity")
-                            fetchRequest.fetchLimit = 1
-                            fetchRequest.predicate = NSPredicate(format: "id == \(apiServiceDetail.gameDetail.id)")
-                            let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-                            batchDeleteRequest.resultType = .resultTypeCount
-
-                            do {
-                                try self.moc.execute(batchDeleteRequest)
-                                self.moc.reset()
-                            } catch let error as NSError {
-                                print("Errornya adalah \(error)")
-                            }
-
-                        }) {
-                            Image(systemName: "heart.fill")
-                        }
-                    } else {
+//                    if isFavorite {
+                    if self.favoriteIdVM.favGame.id == 0 || self.isFavorite == false {
                         Button(action: {
                             print("Ini kalau isFavorite false, trus diklik, jadinya true")
-                            isFavorite = true
+//                            isFavorite = true
+                            if self.apiServiceDetail.gameDetail.id != 0 {
+                                self.addFavoriteVM.id = Int32(self.apiServiceDetail.gameDetail.id)
+                                self.addFavoriteVM.name = self.apiServiceDetail.gameDetail.name
+                                self.addFavoriteVM.backgroundImage = self.apiServiceDetail.gameDetail.backgroundImage
+                                self.addFavoriteVM.released = self.apiServiceDetail.gameDetail.released
+                                self.addFavoriteVM.rating = self.apiServiceDetail.gameDetail.rating
+                                self.addFavoriteVM.website = self.apiServiceDetail.gameDetail.website
+                                self.addFavoriteVM.rawDescription = self.apiServiceDetail.gameDetail.description
 
-                            let favoriteEntity = FavoriteGameEntity(context: self.moc)
-                            favoriteEntity.id = Int32(apiServiceDetail.gameDetail.id)
-                            favoriteEntity.name = apiServiceDetail.gameDetail.name
-                            favoriteEntity.backgroundImage = apiServiceDetail.gameDetail.backgroundImage
-                            favoriteEntity.released = apiServiceDetail.gameDetail.released
-                            favoriteEntity.rating = apiServiceDetail.gameDetail.rating
-                            favoriteEntity.website = apiServiceDetail.gameDetail.website
-                            favoriteEntity.rawDescription = apiServiceDetail.gameDetail.description
-                            favoriteEntity.isFavorite = isFavorite
-
-                            do {
-                                try self.moc.save()
-                                print("Berhasil Save Data")
-                            } catch {
-                                print("Error \(error.localizedDescription)")
+                                let saved = self.addFavoriteVM.addFavorite()
+                                if saved {
+                                    self.isFavorite = saved
+                                }
+                                self.favoriteIdVM.fetchFavoriteId(id: Int32(apiServiceDetail.gameDetail.id))
                             }
                         }) {
                             Image(systemName: "heart")
+                        }
+                    } else {
+                        Button(action: {
+                            if self.apiServiceDetail.gameDetail.id != 0 {
+                                print("Ini kalau isFavorite true, trus diklik, jadinya false")
+    //                            isFavorite = false
+
+                                    self.deleteFavoriteVM.id = Int32(apiServiceDetail.gameDetail.id)
+                                    let removed = self.deleteFavoriteVM.deleteFav()
+
+                                    if removed == true {
+                                        self.isFavorite = false
+                                        print("Berhasil removed, isFavorite false")
+                                    } else {
+                                        self.isFavorite = true
+                                        print("Removed not true, isFavorite true")
+                                    }
+                                    self.favoriteIdVM.fetchFavoriteId(id: Int32(apiServiceDetail.gameDetail.id))
+                            }
+                        }) {
+                            Image(systemName: "heart.fill")
                         }
                     }
                 }
@@ -109,6 +105,7 @@ struct GameDetail: View {
             }
         }.onAppear {
             self.apiServiceDetail.loadDataByAlamofire(id: idGame)
+            self.favoriteIdVM.fetchFavoriteId(id: Int32(idGame))
         }
         .navigationBarTitle(Text(apiServiceDetail.gameDetail.name), displayMode: .inline)
             .padding()

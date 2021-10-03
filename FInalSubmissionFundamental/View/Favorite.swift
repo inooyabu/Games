@@ -8,40 +8,35 @@
 import SwiftUI
 
 struct Favorite: View {
-    @Environment(\.managedObjectContext) var moc
 
-    @FetchRequest(entity: FavoriteGameEntity.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \FavoriteGameEntity.id, ascending: true)]) var favorites: FetchedResults<FavoriteGameEntity>
+    @ObservedObject private var favoriteGameVM = FavoriteListViewModel()
 
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(favorites, id: \.self) { favoriteGame in
-                    NavigationLink(destination: DetailFavorit(fav: favoriteGame.name!)) {
-                            Text(favoriteGame.name!)
+        VStack {
+            if favoriteGameVM.loading {
+                ProgressView()
+            } else {
+                if favoriteGameVM.favoriteGame.count > 0 {
+                    List(favoriteGameVM.favoriteGame, id: \.id) { favGames in
+                        NavigationLink(destination: DetailFavorit(favGameId: Int32(favGames.id))) {
+                            FavoriteGameRow(favGame: favGames)
                         }
+                    }
+                } else {
+                    VStack {
+                        Text("No data")
+                    }.padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
                 }
-                .onDelete(perform: deleteFavorite(at:))
-                if favorites.count == 0 {
-                    Text("No data found")
-                }
+//                else if favoriteGameVM.favoriteGame.count == 0 {
+//                    VStack {
+//                        Text{"No Data Found"}
+//                            .bold()
+//                    }
+//                }
             }
+        }.onAppear {
+            self.favoriteGameVM.fetchFavorite()
         }
-        .listStyle(GroupedListStyle())
-    }
-//Soon Delete
-    func deleteFavorite(at offsets: IndexSet) {
-        for index in offsets {
-            let favorite = favorites[index]
-            moc.delete(favorite)
-            print("Delete \(favorite)")
-        }
-        try? moc.save()
     }
 }
 
-
-struct Favorite_Previews: PreviewProvider {
-    static var previews: some View {
-        Favorite()
-    }
-}

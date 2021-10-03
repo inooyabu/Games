@@ -10,7 +10,9 @@ import Alamofire
 
 class ApiServiceDetail: ObservableObject {
     @Published var gameDetail = DetailGame(id: 0, name: "", backgroundImage: "", description: "", released: "", website: "", rating: 0 )
+    @Published var favoriteDetail = FavoriteGameModel(backgroundImage: "", id: 0, name: "", rating: 0, rawDescription: "", released: "", website: "")
     @Published var loading = false
+
     private let apiKey = "?key=26024279408042a1b63ca087859e393e"
     private let apiURLBase = "https://api.rawg.io/api/games/"
 
@@ -36,6 +38,4 @@ class ApiServiceDetail: ObservableObject {
 
         }
     }
-
 }
-
