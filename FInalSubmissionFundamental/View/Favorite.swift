@@ -39,4 +39,3 @@ struct Favorite: View {
         }
     }
 }
-

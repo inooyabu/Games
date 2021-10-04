@@ -36,7 +36,6 @@ class FavManager {
                     rawDescription: result.value(forKeyPath: "rawDescription") as? String,
                     released: result.value(forKeyPath: "released") as? String,
                     website: result.value(forKeyPath: "website") as? String)
-                
                 DispatchQueue.main.async {
                     completion(favoriteGame)
                 }

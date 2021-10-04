@@ -82,8 +82,7 @@ class FavoriteGameIdVM: ObservableObject {
 
     func fetchFavoriteId(id: Int32) {
         self.loading = true
-        FavManager.shared.getFavoriteId(id) {
-            favGame in
+        FavManager.shared.getFavoriteId(id) { favGame in
             self.loading = false
             guard let favGame = favGame else { return }
             self.favGame = favGame
