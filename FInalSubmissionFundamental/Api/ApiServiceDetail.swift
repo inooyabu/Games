@@ -18,7 +18,6 @@ class ApiServiceDetail: ObservableObject {
 
     init() {
         loading = true
-        loadDataByAlamofire(id: 3328)
     }
 
     func loadDataByAlamofire(id: Int) {

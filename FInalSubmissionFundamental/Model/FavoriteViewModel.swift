@@ -79,13 +79,17 @@ class AddFavorite: ObservableObject {
 class FavoriteGameIdVM: ObservableObject {
     @Published var favGame = FavoriteGameModel(backgroundImage: "", id: 0, name: "", rating: 0, rawDescription: "", released: "", website: "")
     @Published var loading: Bool = false
+    @Published var isFavorited: Bool = false
 
     func fetchFavoriteId(id: Int32) {
         self.loading = true
         FavManager.shared.getFavoriteId(id) { favGame in
             self.loading = false
-            guard let favGame = favGame else { return }
+            guard let favGame = favGame else {
+                self.isFavorited = false
+                return }
             self.favGame = favGame
+            self.isFavorited = true
         }
     }
 }

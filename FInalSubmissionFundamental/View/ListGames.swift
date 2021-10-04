@@ -21,6 +21,8 @@ struct ListGames: View {
                     }
                 }
             }
+        }.onAppear {
+            self.apiService.loadDataByAlamofire()
         }
     }
 }

@@ -19,7 +19,7 @@ class ApiService: ObservableObject {
         loadDataByAlamofire()
     }
 
-    private func loadDataByAlamofire() {
+    func loadDataByAlamofire() {
         AF.request("\(apiURLBase)\(apiKey)")
             .responseJSON { response in
                 switch response.result {
