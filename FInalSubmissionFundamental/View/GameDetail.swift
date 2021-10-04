@@ -36,11 +36,9 @@ struct GameDetail: View {
                         .font(.system(size: 25))
                         .bold()
 
-//                    if isFavorite {
                     if self.favoriteIdVM.favGame.id == 0 || self.isFavorite == false {
                         Button(action: {
                             print("Ini kalau isFavorite false, trus diklik, jadinya true")
-//                            isFavorite = true
                             if self.apiServiceDetail.gameDetail.id != 0 {
                                 self.addFavoriteVM.id = Int32(self.apiServiceDetail.gameDetail.id)
                                 self.addFavoriteVM.name = self.apiServiceDetail.gameDetail.name
@@ -63,7 +61,6 @@ struct GameDetail: View {
                         Button(action: {
                             if self.apiServiceDetail.gameDetail.id != 0 {
                                 print("Ini kalau isFavorite true, trus diklik, jadinya false")
-    //                            isFavorite = false
 
                                     self.deleteFavoriteVM.id = Int32(apiServiceDetail.gameDetail.id)
                                     let removed = self.deleteFavoriteVM.deleteFav()

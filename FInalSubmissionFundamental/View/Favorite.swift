@@ -27,12 +27,6 @@ struct Favorite: View {
                         Text("No data")
                     }.padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
                 }
-//                else if favoriteGameVM.favoriteGame.count == 0 {
-//                    VStack {
-//                        Text{"No Data Found"}
-//                            .bold()
-//                    }
-//                }
             }
         }.onAppear {
             self.favoriteGameVM.fetchFavorite()

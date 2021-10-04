@@ -37,14 +37,6 @@ struct DetailDeveloper: View {
                         Text(game.name)
                     }
                 }
-
-//                List(developer.games) { game in
-//                    VStack(alignment: .leading, spacing: 0) {
-//                        Text(game.name)
-//                            .font(.system(size: 20))
-//                            .bold()
-//                    }.padding(.leading, 8)
-//                }
             }
 
         .navigationBarTitle(Text(developer.name), displayMode: .inline)
